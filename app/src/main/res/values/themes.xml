@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme (splash/launch theme sebelum Compose mengambil alih UI).
+         Project ini pakai Jetpack Compose murni (ComponentActivity) tanpa androidx.appcompat
+         ATAU com.google.android.material (Material Components XML) sebagai dependency —
+         hanya androidx.compose.material3 (namespace Compose, bukan XML). Karena itu parent
+         theme XML TIDAK BOLEH pakai Theme.AppCompat.* atau Theme.Material3.* (keduanya akan
+         gagal resolve karena library-nya tidak ada di classpath). android:Theme.Material.*
+         adalah base theme platform bawaan Android, tidak butuh dependency tambahan, dan aman
+         dipakai di sini karena styling sebenarnya (warna, tipografi) di-drive oleh
+         MaterialTheme{} di Compose, bukan oleh XML theme ini. -->
+    <style name="Theme.DokuPdf" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

@@ -32,8 +32,9 @@ dependencyResolutionManagement {
 rootProject.name = "DokuPdf"
 include(":app")
 
+// [Audit] com.google.firebase.* sudah ditambahkan ke exclusiveContent (transitive dep
+// dari mlkit:document-scanner: firebase-components, firebase-encoders, firebase-encoders-json).
 // TODO 🟡 Kalau nanti muncul "Could not resolve" untuk dependency AndroidX/Google baru
-//         yang grupnya BELUM tercakup regex di atas (mis. grup Firebase `com.google.firebase`),
-//         tambahkan ke daftar includeGroupByRegex, jangan hapus exclusiveContent block-nya —
-//         itu cara yang salah untuk "memperbaiki" masalah serupa (balik ke perilaku lama
-//         yang rawan 429).
+//         yang grupnya BELUM tercakup regex di atas, tambahkan ke daftar includeGroupByRegex,
+//         jangan hapus exclusiveContent block-nya — itu cara yang salah untuk "memperbaiki"
+//         masalah serupa (balik ke perilaku lama yang rawan 429).
