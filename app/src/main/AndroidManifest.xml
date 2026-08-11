@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Status: SKELETON
+  Izin yang dipasang sesuai kebutuhan fitur inti (kamera untuk scan,
+  storage untuk simpan file). Izin lain (mis. INTERNET) sengaja TIDAK
+  disertakan karena app ini full offline di tahap MVP (lihat dokumen
+  rancangan §11 "Keputusan Terkonfirmasi").
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="true" />
+
+    <application
+        android:name=".DokuPdfApp"
+        android:allowBackup="false"
+        android:label="DokuPdf"
+        android:theme="@style/Theme.DokuPdf"
+        android:supportsRtl="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+    <!--
+    TODO 🔴 Tambahkan android:requestLegacyExternalStorage / scoped storage config
+             yang benar saat implementasi nyata modul `data` (penyimpanan file) dibuat.
+    TODO 🟢 Tambahkan izin INTERNET hanya jika CloudAiProvider (§6 dokumen rancangan)
+             benar-benar diaktifkan nanti — jangan ditambahkan lebih awal, supaya
+             app tetap secara jujur "full offline" di tahap MVP.
+    -->
+</manifest>
