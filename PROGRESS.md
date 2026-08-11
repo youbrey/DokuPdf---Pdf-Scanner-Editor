@@ -107,3 +107,16 @@ Status: `RANCANGAN` → `SKELETON` → `SEBAGIAN JALAN` → `SELESAI (MVP)`
 2. UI tab Alat (grid data-driven dari `List<ToolItem>`) — modul 🟡 berikutnya yang belum disentuh.
 3. Aksi per-dokumen di tab File (buka/lihat, hapus) — butuh keputusan viewer PDF dulu.
 4. Modul lain (pdftools, convert, ai, esign, dst.) menyusul.
+
+- **[Tahap 7]** CI: build APK otomatis via GitHub Actions.
+  - `.github/workflows/build-apk.yml` (baru): job `assembleDebug` di ubuntu-latest, JDK 17,
+    Android SDK via `android-actions/setup-android`, Gradle via `gradle/actions/setup-gradle`
+    (proyek belum punya Gradle Wrapper — versi Gradle di-pin manual 8.7, sinkron dengan AGP
+    8.5.0). Hasil APK diupload sebagai artifact.
+  - **Bug ditemukan saat menyiapkan CI**: `app/build.gradle.kts` sudah mereferensikan
+    `proguard-rules.pro` sejak Tahap 1 (`proguardFiles(...)` di `buildTypes.release`) tapi
+    filenya tidak pernah dibuat — akan menggagalkan `assembleRelease`. Dibuat dengan keep
+    rule dasar (ML Kit, PDFBox, Room), tapi **belum divalidasi lewat build release + uji
+    device nyata** — minify bisa saja menghapus kelas yang dibutuhkan reflection ML Kit/PDFBox.
+  - Sengaja HANYA `assembleDebug` di CI ini — release build butuh keystore signing yang
+    belum dikonfigurasi (keputusan ditunda, lihat TODO 🟡 baru).

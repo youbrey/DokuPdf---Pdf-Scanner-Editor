@@ -36,6 +36,9 @@ Prioritas: 🔴 Kritis (blocker alur inti) · 🟡 Penting (dibutuhkan MVP) · �
 - [x] Generate thumbnail dokumen (pakai `ImageSizePresets.THUMBNAIL_MAX_DIM`) — `ScanViewModel.save()` (Tahap 6) generate & enkripsi thumbnail; kegagalan generate ditelan jadi `thumbnailPath = null` (belum di-log, lihat TODO di ScanViewModel.kt)
 - [ ] **[BARU — Tahap 6]** Aksi buka/lihat dokumen dari tab File (dekripsi ke viewer PDF) — di luar cakupan Tahap 6, butuh keputusan viewer PDF dulu
 - [ ] **[BARU — Tahap 6]** `FilesViewModel.thumbnails` cache in-memory tidak pernah dievict — ganti ke LRU sebelum daftar dokumen besar diuji nyata
+- [x] **[BARU — Tahap 7]** `app/proguard-rules.pro` direferensikan `build.gradle.kts` (`proguardFiles(...)`) sejak awal tapi filenya tidak pernah ada — ditemukan saat menyiapkan CI. Dibuat dengan keep rule dasar untuk ML Kit/PDFBox/Room, **belum divalidasi lewat build release + uji device nyata** (lihat TODO 🔴 di dalam file itu sendiri).
+- [ ] **[BARU — Tahap 7]** CI (`.github/workflows/build-apk.yml`) baru mencakup `assembleDebug` — belum ada job release (butuh keystore signing via GitHub Secrets, keputusan belum diambil) dan belum ada step unit test (belum ada unit test nyata di proyek).
+- [ ] **[BARU — Tahap 7]** Proyek belum punya Gradle Wrapper (`gradlew`/`gradle-wrapper.jar`) — CI memakai `gradle/actions/setup-gradle` dengan versi Gradle di-pin manual. Commit wrapper begitu proyek pernah dibuka sekali di Android Studio, lalu update workflow untuk pakai `./gradlew` (lihat TODO di build-apk.yml).
 
 ## 🟢 Nanti — pasca-MVP / bisa menyusul
 - [ ] `convert` (PDF↔Word/Excel/PPT via Apache POI) — tunda karena menambah ukuran APK signifikan, perlu keputusan (lihat dokumen rancangan §12 poin 4)
