@@ -1,0 +1,88 @@
+# =============================================================
+# DokuPdf — CI: Build APK
+# Status: BARU (Tahap 7)
+#
+# Proyek ini BELUM punya Gradle Wrapper (gradlew/gradlew.bat/gradle-wrapper.jar
+# tidak ada di repo — lihat catatan di bawah), jadi workflow ini memakai
+# gradle/actions/setup-gradle yang bisa men-download & menjalankan Gradle
+# langsung tanpa wrapper (parameter `gradle-version`).
+#
+# TODO 🟡 Setelah proyek dijalankan sekali di mesin lokal dengan Android Studio
+#         (yang otomatis generate wrapper), commit gradlew + gradlew.bat +
+#         gradle/wrapper/gradle-wrapper.jar ke repo, lalu ganti workflow ini
+#         untuk pakai wrapper (`./gradlew ...`) — praktik standar Android CI,
+#         memastikan versi Gradle yang dipakai developer lokal & CI identik.
+#         Untuk sekarang, versi Gradle di-pin manual di bawah (harus disinkron
+#         manual dengan compatibility AGP 8.5.0 di build.gradle.kts kalau
+#         salah satunya di-bump).
+# =============================================================
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Batalkan run lama kalau ada push baru di branch/PR yang sama — hemat menit CI.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17" # harus cocok dengan compileOptions/kotlinOptions jvmTarget di app/build.gradle.kts
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        # Menginstal cmdline-tools + menerima lisensi SDK yang dibutuhkan compileSdk 35.
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7" # minimum yang didukung AGP 8.5.0 — sinkron manual, lihat TODO di atas
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Build debug APK
+        run: gradle assembleDebug --stacktrace
+        # Sengaja HANYA assembleDebug untuk CI rutin — assembleRelease butuh
+        # keystore signing (belum dikonfigurasi, lihat TODO 🟡 di bawah) dan
+        # proguard-rules.pro di sini baru dibuat Tahap 7, BELUM divalidasi
+        # lewat build release + uji device nyata (lihat TODO di proguard-rules.pro).
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dokupdf-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+# =============================================================
+# TODO Prioritas workflow build-apk.yml
+# =============================================================
+# TODO 🟡 Belum ada job build release (signed APK/AAB) — butuh keystore signing
+#         yang disimpan sebagai GitHub Secrets (mis. KEYSTORE_BASE64, KEYSTORE_PASSWORD,
+#         KEY_ALIAS, KEY_PASSWORD) + signingConfigs di app/build.gradle.kts (belum ada
+#         sama sekali di build.gradle.kts saat ini — buildTypes.release tidak
+#         mereferensikan signingConfig, jadi assembleRelease sekarang pun hasilnya
+#         APK unsigned). Jangan tambahkan job ini sebelum keputusan keystore dibuat.
+# TODO 🟡 Belum ada step unit test (`gradle test`) di workflow ini — tambahkan sebagai
+#         job/step terpisah begitu ada unit test nyata di proyek (lihat TODO 🟡
+#         "round-trip test" di AesGcmFileEncryptor.kt, belum ditulis).
+# TODO 🟢 Pertimbangkan matrix build (mis. beberapa API level util instrumented test)
+#         HANYA setelah ada instrumented test nyata — belum relevan selama proyek
+#         belum diuji di device/emulator sama sekali (lihat blocker 🔴 di TODO.md).
