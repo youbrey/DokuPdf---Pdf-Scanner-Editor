@@ -120,3 +120,15 @@ Status: `RANCANGAN` → `SKELETON` → `SEBAGIAN JALAN` → `SELESAI (MVP)`
     device nyata** — minify bisa saja menghapus kelas yang dibutuhkan reflection ML Kit/PDFBox.
   - Sengaja HANYA `assembleDebug` di CI ini — release build butuh keystore signing yang
     belum dikonfigurasi (keputusan ditunda, lihat TODO 🟡 baru).
+
+- **[Tahap 8]** CI run pertama dari Tahap 7 dijalankan → **BUILD FAILED**. Log dianalisis:
+  - Root cause: task `:app:checkDebugAarMetadata` gagal karena `gradle.properties`
+    **tidak pernah ada** sejak skeleton Tahap 1 — `android.useAndroidX` tidak diaktifkan
+    padahal seluruh dependency proyek (Compose, Room, Hilt, CameraX, ML Kit) adalah AndroidX.
+    Ini bukan sesuatu yang kelihatan lewat audit statis sebelumnya (Gradle baru
+    memvalidasinya di tahap resolusi dependency saat build nyata dijalankan) — baru
+    terungkap begitu CI pertama kali benar-benar jalan.
+  - Dibuat `gradle.properties` dengan `android.useAndroidX=true` (wajib, ini fix-nya),
+    `android.nonTransitiveRClass=true` (standar berpasangan), dan `org.gradle.jvmargs`
+    (heap lebih besar untuk build KSP Room+Hilt bersamaan di runner CI).
+  - **Belum diverifikasi lolos** — menunggu commit + push + run CI berikutnya.
