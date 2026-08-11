@@ -21,6 +21,7 @@ dependencyResolutionManagement {
                 includeGroupByRegex("com\\.android.*")
                 includeGroupByRegex("com\\.google\\.android.*")
                 includeGroupByRegex("com\\.google\\.mlkit.*")
+                includeGroupByRegex("com\\.google\\.firebase.*")
                 includeGroupByRegex("androidx.*")
             }
         }
