@@ -132,3 +132,16 @@ Status: `RANCANGAN` → `SKELETON` → `SEBAGIAN JALAN` → `SELESAI (MVP)`
     `android.nonTransitiveRClass=true` (standar berpasangan), dan `org.gradle.jvmargs`
     (heap lebih besar untuk build KSP Room+Hilt bersamaan di runner CI).
   - **Belum diverifikasi lolos** — menunggu commit + push + run CI berikutnya.
+
+- **[Tahap 9]** CI run ke-2 (setelah fix Tahap 8) → **BUILD FAILED lagi**, error BEDA:
+  - `Could not resolve com.google.mlkit:document-scanner:16.0.0-beta1` — Gradle sempat
+    ikut mencari artefak ini ke Maven Central (`repo.maven.apache.org`) dan kena
+    **429 Too Many Requests** dari sana, padahal artefak ML Kit ini memang tidak pernah
+    ada di Maven Central (hanya di `google()`) — pencarian ke sana murni membuang query
+    dan menaikkan risiko kena rate-limit.
+  - Fix: `settings.gradle.kts` sekarang membatasi grup `com.android.*`, `androidx.*`,
+    `com.google.android.*`, `com.google.mlkit.*` supaya HANYA dicari di `google()` lewat
+    `exclusiveContent { forRepository { google() }; filter { includeGroupByRegex(...) } }`.
+    Ini bukan sekadar workaround rate-limit sesaat — mencegah kelas masalah ini terulang
+    untuk dependency Google/AndroidX lain, dan mempercepat resolusi (tidak lagi query 2 repo).
+  - **Belum diverifikasi lolos** — menunggu commit + push + run CI berikutnya.
